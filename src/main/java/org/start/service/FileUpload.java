@@ -1,5 +1,7 @@
 package org.start.service;
 
+import org.eclipse.microprofile.config.inject.ConfigProperties;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -18,17 +20,24 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
+
 import org.start.upload.*;
 
 @Path("file")
 public class FileUpload {
     private static final Logger LOGGER = Logger.getLogger(FileUpload.class.getName());
 
+    @ConfigProperty(name = "local-files.location")
+    String SERVER_UPLOAD_LOCATION_FOLDER;
+
     @Path("upload")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
     public Response upload(MultipartFormDataInput input) throws Exception {
+
+        // modify to Dependence Injection
+        UploadHelper helper = new UploadHelper();
 
 
         String fileName = "";
@@ -39,22 +48,20 @@ public class FileUpload {
             try {
                 // Retrieve headers, read the Content-Disposition header to obtain the original name of the file
                 MultivaluedMap<String, String> headers = inputPart.getHeaders();
-                String[] contentDispositionHeader = headers.getFirst("Content-Disposition").split(";");
-                for (String name : contentDispositionHeader) {
-                    if ((name.trim().startsWith("filename"))) {
-                        String[] tmp = name.split("=");
-                        fileName = tmp[1].trim().replaceAll("\"", "");
-                    }
-                }
+                fileName = helper.parseFileName(headers);
+
 
                 // Handle the body of that part with an InputStream
-                InputStream istream = inputPart.getBody(InputStream.class, null);
+                InputStream istream = inputPart.getBody(InputStream.class,  null);
 
-                System.out.println("d");
+                fileName = SERVER_UPLOAD_LOCATION_FOLDER + fileName;
 
-                /* ..etc.. */
-            } catch (IOException e) {
+                helper.saveFile(istream, fileName);
+
+            } catch (Exception e) {
                 e.printStackTrace();
+                String msgOutput = "Error while uploading file ";
+                return Response.status(500).entity(msgOutput).build();
             }
         }
 
