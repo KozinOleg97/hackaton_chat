@@ -7,10 +7,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -21,6 +18,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
+import org.start.entity.TestData;
 import org.start.upload.*;
 
 @Path("file")
@@ -30,7 +28,7 @@ public class FileUpload {
     @ConfigProperty(name = "local-files.location")
     String SERVER_UPLOAD_LOCATION_FOLDER;
 
-    @Path("upload")
+    @Path("upload1")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
@@ -52,7 +50,7 @@ public class FileUpload {
 
 
                 // Handle the body of that part with an InputStream
-                InputStream istream = inputPart.getBody(InputStream.class,  null);
+                InputStream istream = inputPart.getBody(InputStream.class, null);
 
                 fileName = SERVER_UPLOAD_LOCATION_FOLDER + fileName;
 
@@ -70,7 +68,7 @@ public class FileUpload {
     }
 
 
-    @Path("test")
+    @Path("upload2")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
@@ -84,4 +82,10 @@ public class FileUpload {
         return MessageFormat.format("File path: {0}", input.file.getAbsolutePath());
     }
 
+    @Path("test")
+    @GET
+    public TestData testReq() {
+        System.out.println("test call");
+        return new TestData("123", "qwe");
+    }
 }
