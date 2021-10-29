@@ -21,14 +21,14 @@ import java.util.Map;
 import org.start.entity.TestData;
 import org.start.upload.*;
 
-@Path("file")
+@Path("aoi/v1/file")
 public class FileUpload {
     private static final Logger LOGGER = Logger.getLogger(FileUpload.class.getName());
 
     @ConfigProperty(name = "local-files.location")
     String SERVER_UPLOAD_LOCATION_FOLDER;
 
-    @Path("upload1")
+    @Path("upload")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
@@ -50,12 +50,13 @@ public class FileUpload {
 
 
                 // Handle the body of that part with an InputStream
+                // Закрывать стрим при ошибке надо бы
                 InputStream istream = inputPart.getBody(InputStream.class, null);
 
                 fileName = SERVER_UPLOAD_LOCATION_FOLDER + fileName;
 
                 helper.saveFile(istream, fileName);
-
+                istream.close();
             } catch (Exception e) {
                 e.printStackTrace();
                 String msgOutput = "Error while uploading file ";
