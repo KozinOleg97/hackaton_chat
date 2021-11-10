@@ -6,6 +6,7 @@ import org.start.entity.Document;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RequestScoped
@@ -14,12 +15,12 @@ public class CardData {
     public Long id;
     public String code;
     public String name;
-    public LocalDate date;
+    public ZonedDateTime date;
     public Boolean type = false;
-    public LocalDate date_of_issue;
-    public int inventory_number;
+    public ZonedDateTime date_of_issue;
+    public String inventory_number;
     public Document doc;
-    public List<Abonent> abonents;
+    public List<Integer> abonent_ids;
 
 
 }

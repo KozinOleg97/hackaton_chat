@@ -1,37 +1,41 @@
-package org.start.service;
+package org.start.services;
 
-import org.eclipse.microprofile.config.inject.ConfigProperties;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
+import org.start.entity.Document;
 import org.start.entity.TestData;
 import org.start.upload.*;
 
-@Path("aoi/v1/file")
-public class FileUpload {
-    private static final Logger LOGGER = Logger.getLogger(FileUpload.class.getName());
+@Path("api/v1/files")
+@ApplicationScoped
+public class FileUploadService {
+    private static final Logger LOGGER = Logger.getLogger(FileUploadService.class.getName());
 
     @ConfigProperty(name = "local-files.location")
     String SERVER_UPLOAD_LOCATION_FOLDER;
 
-    @Path("upload")
+    @Path("")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
+    @Transactional
     public Response upload(MultipartFormDataInput input) throws Exception {
 
         // modify to Dependence Injection
@@ -39,6 +43,7 @@ public class FileUpload {
 
 
         String fileName = "";
+        String fileNameWithPath = "";
         Map<String, List<InputPart>> formParts = input.getFormDataMap();
 
         List<InputPart> inPart = formParts.get("file"); // "file" should match the name attribute of your HTML file input
@@ -53,9 +58,9 @@ public class FileUpload {
                 // Закрывать стрим при ошибке надо бы
                 InputStream istream = inputPart.getBody(InputStream.class, null);
 
-                fileName = SERVER_UPLOAD_LOCATION_FOLDER + fileName;
+                fileNameWithPath = SERVER_UPLOAD_LOCATION_FOLDER + fileName;
 
-                helper.saveFile(istream, fileName);
+                helper.saveFile(istream, fileNameWithPath);
                 istream.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -64,8 +69,25 @@ public class FileUpload {
             }
         }
 
-        String msgOutput = "Successfully uploaded file " + fileName;
-        return Response.status(200).entity(msgOutput).build();
+        String msgOutput = "Successfully uploaded file " + fileNameWithPath;
+
+        //TODO нужно ловить ошибки нормально
+        int lastIndexOf = fileName.lastIndexOf(".");
+
+        String fileExtension = fileName.substring(lastIndexOf + 1);
+
+
+        Document doc = new Document();
+
+        doc.date = ZonedDateTime.now();
+        doc.doc_type = fileExtension;
+        doc.comment = "";
+        doc.original_name = fileName;
+        doc.path_to_file = fileNameWithPath;
+
+        doc.persistAndFlush();
+
+        return Response.ok(doc.id).build();
     }
 
 
@@ -90,3 +112,4 @@ public class FileUpload {
         return new TestData("123", "qwe");
     }
 }
+

@@ -1,24 +1,28 @@
 package org.start.entity;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Set;
+import java.time.ZonedDateTime;
+import java.util.Collection;
 
-@Audited
+//@Audited
 @Entity
-//@JsonIdentityInfo(
-//        generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id"
-//
-//)
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id"
+
+)
 
 public class Abonent extends PanacheEntity {
 
-    public String abonent;
-    public LocalDate date;
+    public String code;
+    public ZonedDateTime date;
     public String name;
 
     /**
@@ -28,12 +32,12 @@ public class Abonent extends PanacheEntity {
     /**
      * Что за поле? плохое название
      */
-    public LocalDate wr_off;
+    public ZonedDateTime wr_off;
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "abonents", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    //@JsonBackReference
-    public Set<Card> cards;
+
+    @OneToMany(mappedBy = "abonent")
+    public Collection<CardToAbonent> cards;
+
 
 
 }
