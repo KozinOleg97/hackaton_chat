@@ -7,6 +7,7 @@ import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -19,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
+import org.start.beans.file.FormData;
 import org.start.entity.Document;
 import org.start.entity.TestData;
 import org.start.upload.*;
@@ -27,6 +29,8 @@ import org.start.upload.*;
 @ApplicationScoped
 public class FileUploadService {
     private static final Logger LOGGER = Logger.getLogger(FileUploadService.class.getName());
+
+
 
     @ConfigProperty(name = "local-files.location")
     String SERVER_UPLOAD_LOCATION_FOLDER;
@@ -104,6 +108,9 @@ public class FileUploadService {
 
         return MessageFormat.format("File path: {0}", input.file.getAbsolutePath());
     }
+
+
+
 
     @Path("test")
     @GET

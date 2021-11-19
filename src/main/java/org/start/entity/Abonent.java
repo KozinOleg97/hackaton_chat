@@ -28,7 +28,7 @@ public class Abonent extends PanacheEntity {
     /**
      * Это что за поле?
      */
-    public int num;
+    public String num;
     /**
      * Что за поле? плохое название
      */
