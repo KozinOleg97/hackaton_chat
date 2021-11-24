@@ -80,55 +80,23 @@ public class CardService {
         Card card = Card.findById(id);
 
 
-        List<PanacheEntityBase> cardToAbonent = CardToAbonent.list("card_id", id);
+        //List<PanacheEntityBase> cardToAbonent = CardToAbonent.list("card_id", id);
 
+        /*
+        Возвращает список абонентов связанных с выбранной карточкой
+         */
         Collection<CardToAbonent> list = Abonent.find("SELECT a " +
                 "FROM Abonent a " +
                 "INNER JOIN a.cards c " +
                 "WHERE c.card =  ?1", card).list();
 
-//        PanacheQuery<PanacheEntityBase> panacheEntityBasePanacheQuery = Abonent.find("select distinct a " +
-//                "from Abonent a" +
-//                "inner join  a.cards");
-
-        //Abonent.list("SELECT items from Abonent items")
-        //Abonent.list("id IN (?1)", );
 
 
-//        Session session = em.unwrap(Session.class);
-//        MultiIdentifierLoadAccess<Abonent> multiLoadAccess = session.byMultipleIds(Abonent.class);
-//        List
-
-//        List<Abonent> abonents = CardToAbonent.find
-//                ("SELECT * FROM abonent\n" +
-//                        "INNER JOIN cardtoabonent on abonent.id = cardtoabonent.abonent_id\n" +
-//                        "WHERE card_id = ?1", id).list();
-
-
-//        List<Card_to_abonent> cardToAbonents = Card_to_abonent.listAll();
-
-///*TODO сюда нормальный запрос к базе, эт для теста*/
-//        List<CardToAbonent> list = CardToAbonent.find("card_id", id).list();
-//        List<Abonent> abonents = list.stream().map(cardToAbonent -> cardToAbonent.abonent).collect(Collectors.toList());
-
-
-//        CardToAbonent cardToAbonent = CardToAbonent.list();
-
-
-//        CardData data = new CardData();
-//
-//        data.name = card.name;
-//        data.id = card.id;
-//        data.date = card.date;
-//        data.code = card.code;
-//        data.date_of_issue = card.date_of_issue;
-//        data.doc = card.doc;
-//        data.inventory_number = card.inventory_number;
-//        data.type = card.type;
-//        data.abonents = list;
+        List<Correction> corrections = Correction.list("card_id", id);
 
 
         card.abonents = list;
+        card.corrections = corrections;
 
         return Response.ok(card).build();
     }
