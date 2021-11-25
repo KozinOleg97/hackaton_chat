@@ -31,7 +31,6 @@ public class FileUploadService {
     private static final Logger LOGGER = Logger.getLogger(FileUploadService.class.getName());
 
 
-
     @ConfigProperty(name = "local-files.location")
     String SERVER_UPLOAD_LOCATION_FOLDER;
 
@@ -45,9 +44,13 @@ public class FileUploadService {
         // modify to Dependence Injection
         UploadHelper helper = new UploadHelper();
 
+        ZonedDateTime curDateTime = null;
 
-        String fileName = "";
+        String fileNameOrigin = "";
+        String fileNameGenerated = "";
         String fileNameWithPath = "";
+        String fileExtension = "";
+
         Map<String, List<InputPart>> formParts = input.getFormDataMap();
 
         List<InputPart> inPart = formParts.get("file"); // "file" should match the name attribute of your HTML file input
@@ -55,14 +58,22 @@ public class FileUploadService {
             try {
                 // Retrieve headers, read the Content-Disposition header to obtain the original name of the file
                 MultivaluedMap<String, String> headers = inputPart.getHeaders();
-                fileName = helper.parseFileName(headers);
+                fileNameOrigin = helper.parseFileName(headers);
 
+                //Extension from ORIGINAL NAME WITHOUT "."
+                int lastIndexOf = fileNameOrigin.lastIndexOf(".");
+                fileExtension = fileNameOrigin.substring(lastIndexOf + 1);
 
                 // Handle the body of that part with an InputStream
                 // Закрывать стрим при ошибке надо бы
                 InputStream istream = inputPart.getBody(InputStream.class, null);
 
-                fileNameWithPath = SERVER_UPLOAD_LOCATION_FOLDER + fileName;
+                //Use generated fileName
+                fileNameGenerated = helper.generateUniqueName();
+                //generate date for db
+                curDateTime = ZonedDateTime.now();
+
+                fileNameWithPath = SERVER_UPLOAD_LOCATION_FOLDER + fileNameGenerated + "." + fileExtension;
 
                 helper.saveFile(istream, fileNameWithPath);
                 istream.close();
@@ -75,24 +86,22 @@ public class FileUploadService {
 
         String msgOutput = "Successfully uploaded file " + fileNameWithPath;
 
+        //After successful file write to disc
         //TODO нужно ловить ошибки нормально
-        int lastIndexOf = fileName.lastIndexOf(".");
-
-        String fileExtension = fileName.substring(lastIndexOf + 1);
-
-
         Document doc = new Document();
 
-        doc.date = ZonedDateTime.now();
+        doc.date = curDateTime;
         doc.doc_type = fileExtension;
         doc.comment = "";
-        doc.original_name = fileName;
+        doc.original_name = fileNameOrigin;
         doc.path_to_file = fileNameWithPath;
 
         doc.persistAndFlush();
 
         return Response.ok(doc.id).build();
     }
+
+
 
 
     @Path("upload2")
@@ -108,8 +117,6 @@ public class FileUploadService {
 
         return MessageFormat.format("File path: {0}", input.file.getAbsolutePath());
     }
-
-
 
 
     @Path("test")

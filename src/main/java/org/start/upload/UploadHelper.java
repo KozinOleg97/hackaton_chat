@@ -2,6 +2,8 @@ package org.start.upload;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class UploadHelper {
 
@@ -27,7 +29,7 @@ public class UploadHelper {
 
     // save uploaded file to a defined location on the server
     public void saveFile(InputStream uploadedInputStream,
-                          String serverLocation) {
+                         String serverLocation) {
 
         try {
             OutputStream outpuStream = new FileOutputStream(new File(serverLocation));
@@ -44,6 +46,21 @@ public class UploadHelper {
 
             e.printStackTrace();
         }
+    }
+
+
+    public String generateUniqueName() {
+        String filename = "";
+
+        int max = 1000;
+        int min = 9999;
+        String rndStr = String.valueOf(min + (int) (Math.random() * ((max - min) + 1)));
+
+
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+
+        filename = timeStamp + "_rnd-" + rndStr;
+        return filename;
     }
 
 }
