@@ -3,15 +3,21 @@
 #
 # Before building the container image run:
 #
+# sudo mvn package
+# docker build -f src/main/docker/Dockerfile.jvm -t kozinoleg97/start-back-cards:v1 .
+# docker run -i --rm -p 8080:8080 kozinoleg97/start-back-cards:v1 --volume=/home/user1/uploads:/deployments/uploads
+#
+#
 # ./mvnw package
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.jvm -t quarkus/cards_archive_service_for_start-jvm .
-#
+# docker build -f src/main/docker/Dockerfile.jvm -t kozinoleg97/start-back-cards:v1 .
+
+
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 quarkus/cards_archive_service_for_start-jvm
+# docker run -i --rm -p 8080:8080 kozinoleg97/start-back-cards:v1 --mount type=volume,source=uploads, destination=/deployments/uploads
 #
 # If you want to include the debug port into your docker image
 # you will have to expose the debug port (default 5005) like this :  EXPOSE 8080 5005
@@ -39,6 +45,10 @@ RUN microdnf install curl ca-certificates ${JAVA_PACKAGE} \
     && chown 1001 /deployments/run-java.sh \
     && chmod 540 /deployments/run-java.sh \
     && echo "securerandom.source=file:/dev/urandom" >> /etc/alternatives/jre/conf/security/java.security
+
+RUN mkdir /uploads \
+    && mkdir /uploads/tmp \
+    && ls
 
 # Configure the JAVA_OPTIONS, you can add -XshowSettings:vm to also display the heap size.
 ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"

@@ -1,0 +1,9 @@
+version: '3'
+services:
+  postgres:
+    image: kozinoleg97/start-back-cards:v1
+    container_name: start-back-cards
+    volumes:
+      - ./uploads:/deployments/upload
+    ports:
+      - 8080:8080
