@@ -57,9 +57,9 @@ public class UploadHelper {
         String rndStr = String.valueOf(min + (int) (Math.random() * ((max - min) + 1)));
 
 
-        String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH_mm_ss").format(new Date());
 
-        filename = timeStamp + "_rnd-" + rndStr;
+        filename = timeStamp + "-rnd-" + rndStr;
         return filename;
     }
 

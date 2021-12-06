@@ -20,6 +20,7 @@ public class CardData {
     public ZonedDateTime date_of_issue;
     public String inventory_number;
     public Document doc;
+    //TODO Long or Integer
     public List<Integer> abonent_ids;
 
 

@@ -2,6 +2,7 @@ package org.start.services;
 
 import org.jboss.logging.Logger;
 import org.start.beans.abonent.AbonentData;
+import org.start.beans.abonent.AbonentIDsList;
 import org.start.entity.Abonent;
 import org.start.entity.Card;
 import org.start.entity.CardToAbonent;
@@ -41,10 +42,11 @@ public class AbonentService {
     @POST
     @Path("/{id}")
     @Transactional
-    public Response addAbonentToCard(@PathParam("id") long card_id, long[] abonentIdList) {
+    public Response addAbonentToCard(AbonentIDsList abonentIdList, @PathParam("id") long card_id) {
+        System.out.println("qwe");
 
 
-        for (long abonentId : abonentIdList) {
+        for (long abonentId : abonentIdList.abonent_ids) {
             CardToAbonent cardToAbonent = new CardToAbonent();
 
             //TODO желательно на нормальный запрос INSERT переделать

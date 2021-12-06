@@ -13,7 +13,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
@@ -21,9 +23,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.start.beans.file.FormData;
+import org.start.entity.Correction;
 import org.start.entity.Document;
 import org.start.entity.TestData;
 import org.start.upload.*;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 @Path("api/v1/files")
 @ApplicationScoped
@@ -102,8 +106,6 @@ public class FileUploadService {
     }
 
 
-
-
     @Path("upload2")
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -117,6 +119,48 @@ public class FileUploadService {
 
         return MessageFormat.format("File path: {0}", input.file.getAbsolutePath());
     }
+
+
+
+    @GET
+    @Path("download/{id}")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response downloadFileWithGet(@PathParam("id") long correction_id) {
+
+        Correction correction = Correction.findById(correction_id);
+
+        //System.out.println("Download file "+file);
+
+        File fileDownload = new File(correction.doc.path_to_file);
+
+        ResponseBuilder response = Response.ok((Object) fileDownload);
+        response.header("Content-Disposition", "attachment;filename=" + correction.doc.original_name);
+
+        return response.build();
+    }
+
+//    @Path("download/{id}")
+//    @GET
+//    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+//    public Response downloadFileByID(@PathParam("id") long correction_id) throws Exception {
+//
+//        Correction correction = Correction.findById(correction_id);
+//
+//        File file = new File(correction.doc.path_to_file);
+//
+//        //return Response.ok(file).build();
+//
+//
+//        InputStream is = new FileInputStream(correction.doc.path_to_file);
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        int len;
+//        byte[] buffer = new byte[4096];
+//        while ((len = is.read(buffer, 0, buffer.length)) != -1) {
+//            baos.write(buffer, 0, len);
+//        }
+//
+//        return Response.ok(baos).build();
+//    }
 
 
     @Path("test")
