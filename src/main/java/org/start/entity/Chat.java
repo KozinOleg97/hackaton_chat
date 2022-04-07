@@ -14,24 +14,19 @@ import java.util.Collection;
         generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id"
 
 )
-public class Card extends PanacheEntity {
+public class Chat extends PanacheEntity {
 
-    public String code;
+    public String description;
     public String name;
-    public ZonedDateTime date;
-    public Boolean type = false;
+    public Boolean is_grope_chat;
     public ZonedDateTime date_of_issue;
-    public String inventory_number;
 
 
+    @OneToMany(mappedBy = "chat")
+    public Collection<ChatToAbonent> abonents;
 
-
-
-    @OneToMany(mappedBy = "card")
-    public Collection<CardToAbonent> abonents;
-
-    @OneToMany(mappedBy = "card")
-    public Collection<Correction> corrections;
+    @OneToMany(mappedBy = "chat")
+    public Collection<Message> messages;
 
 
 

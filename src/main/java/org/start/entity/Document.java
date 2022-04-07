@@ -18,11 +18,10 @@ public class Document extends PanacheEntity {
     public String original_name;
     public String doc_type;
     public ZonedDateTime date;
-    public int number_of_pages;
+
     public String comment;
-    public String format = "A4";
 
 
     @OneToOne(mappedBy = "doc")
-    public Correction correction;
+    public Message message;
 }

@@ -1,6 +1,6 @@
 package org.start.beans.abonent;
 
-import org.start.entity.Card;
+import org.start.entity.Chat;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -18,6 +18,6 @@ public class AbonentData {
      * Что за поле? плохое название
      */
     public ZonedDateTime wr_off;
-    public List<Card> cards;
+    public List<Chat> chats;
 
 }

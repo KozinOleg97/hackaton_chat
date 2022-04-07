@@ -4,8 +4,8 @@ import org.jboss.logging.Logger;
 import org.start.beans.abonent.AbonentData;
 import org.start.beans.abonent.AbonentIDsList;
 import org.start.entity.Abonent;
-import org.start.entity.Card;
-import org.start.entity.CardToAbonent;
+import org.start.entity.Chat;
+import org.start.entity.ChatToAbonent;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
@@ -30,7 +30,6 @@ public class AbonentService {
         abonent.code = abonentData.code;
         abonent.date = abonentData.date;
         abonent.name = abonentData.name;
-        abonent.num = abonentData.num;
 
 
         abonent.persistAndFlush();
@@ -47,13 +46,13 @@ public class AbonentService {
 
 
         for (long abonentId : abonentIdList.abonent_ids) {
-            CardToAbonent cardToAbonent = new CardToAbonent();
+            ChatToAbonent chatToAbonent = new ChatToAbonent();
 
             //TODO желательно на нормальный запрос INSERT переделать
-            cardToAbonent.card = Card.findById(card_id);
-            cardToAbonent.abonent = Abonent.findById(abonentId);
+            chatToAbonent.chat = Chat.findById(card_id);
+            chatToAbonent.abonent = Abonent.findById(abonentId);
 
-            cardToAbonent.persist();
+            chatToAbonent.persist();
 
         }
 

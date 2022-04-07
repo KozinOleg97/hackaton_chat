@@ -1,9 +1,8 @@
 package org.start.services;
 
-import org.start.beans.card.CardData;
 import org.start.beans.correction.CorrectionData;
-import org.start.entity.Card;
-import org.start.entity.Correction;
+import org.start.entity.Chat;
+import org.start.entity.Message;
 import org.start.entity.Document;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -23,16 +22,13 @@ public class CorrectionService {
     @Transactional
     public Response addNew(@PathParam("id") long card_id, CorrectionData correctionData) {
 
-        Correction correction = new Correction();
+        Message message = new Message();
 
-        correction.card = Card.findById(card_id);
-        correction.code = correctionData.code;
-        correction.name = correctionData.name;
-        correction.date = correctionData.date;
-        correction.doc = Document.findById(correctionData.doc.id);
+        message.chat = Chat.findById(card_id);
+        message.doc = Document.findById(correctionData.doc.id);
 
 
-        correction.persistAndFlush();
-        return Response.ok(correction.id).build();
+        message.persistAndFlush();
+        return Response.ok(message.id).build();
     }
 }

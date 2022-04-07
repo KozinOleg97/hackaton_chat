@@ -7,26 +7,22 @@ import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
-import org.start.beans.file.FormData;
-import org.start.entity.Correction;
+import org.start.entity.Message;
 import org.start.entity.Document;
-import org.start.entity.TestData;
 import org.start.upload.*;
+
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 @Path("api/v1/files")
@@ -121,20 +117,19 @@ public class FileUploadService {
     }
 
 
-
     @GET
     @Path("download/{id}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response downloadFileWithGet(@PathParam("id") long correction_id) {
 
-        Correction correction = Correction.findById(correction_id);
+        Message message = Message.findById(correction_id);
 
         //System.out.println("Download file "+file);
 
-        File fileDownload = new File(correction.doc.path_to_file);
+        File fileDownload = new File(message.doc.path_to_file);
 
         ResponseBuilder response = Response.ok((Object) fileDownload);
-        response.header("Content-Disposition", "attachment;filename=" + correction.doc.original_name);
+        response.header("Content-Disposition", "attachment;filename=" + message.doc.original_name);
 
         return response.build();
     }
@@ -163,11 +158,5 @@ public class FileUploadService {
 //    }
 
 
-    @Path("test")
-    @GET
-    public TestData testReq() {
-        System.out.println("test call");
-        return new TestData("123", "qwe");
-    }
 }
 
