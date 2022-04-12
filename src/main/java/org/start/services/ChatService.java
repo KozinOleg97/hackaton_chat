@@ -1,17 +1,20 @@
 package org.start.services;
 
-import io.quarkus.panache.common.Sort;
+import io.quarkus.security.Authenticated;
+import io.quarkus.security.identity.SecurityIdentity;
+import org.start.beans.Chat.FriendRequest;
 import org.start.beans.card.CardData;
 import org.start.entity.*;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
-import java.util.List;
 
+@Authenticated
 @Path("api/v1/chats")
 @ApplicationScoped
 @Produces("application/json")
@@ -20,6 +23,9 @@ public class ChatService {
 
     private static final Logger LOGGER = Logger.getLogger(ChatService.class.getName());
 
+
+    @Inject
+    SecurityIdentity securityIdent;
 
     @POST
     @Path("")
@@ -56,12 +62,19 @@ public class ChatService {
     }
 
     @POST
-    @Path("add2")
+    @Path("friends")
     @Transactional
-    public Response addNew(Chat chat) {
+    public Response addFriend(FriendRequest friendRequest) {
 
-        chat.persist();
-        return Response.ok(chat.id).build();
+        AbonentAddressBook rec = new AbonentAddressBook();
+
+
+        //rec.
+
+        //AbonentAddressBook book = AbonentAddressBook.findById(rec)
+
+        // chat.persist();
+        return Response.ok().build();
     }
 
 
@@ -91,8 +104,9 @@ public class ChatService {
     @GET
     @Path("")
     public Response getListOfChatsByAbonentLogin() {
-        //TODO переделать на получение логина через jwt и на ЛОГИН
-        String abonent_name = "Name_2";
+        SecurityIdentity s = securityIdent;
+
+        String abonent_name = s.getPrincipal().getName();;
 
 
         Collection<Chat> list = Chat.find("select c from Chat c\n" +
@@ -111,14 +125,6 @@ public class ChatService {
 
 
         return Response.ok(messageList).build();
-    }
-
-
-    @GET
-    @Path("list2")
-    public List<Abonent> getAbonents() {
-        List<Abonent> list = Abonent.listAll(Sort.by("date"));
-        return list;
     }
 
 

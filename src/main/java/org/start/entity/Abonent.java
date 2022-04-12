@@ -34,4 +34,12 @@ public class Abonent extends PanacheEntity {
     public Collection<Message> messages;
 
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "requester")
+    private Collection<AbonentAddressBook> friendRequests;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "friend")
+    private Collection<AbonentAddressBook> friends;
+
+
+
 }
