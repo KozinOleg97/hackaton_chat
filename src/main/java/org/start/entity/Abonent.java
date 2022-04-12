@@ -27,6 +27,11 @@ public class Abonent extends PanacheEntity {
     @OneToMany(mappedBy = "abonent")
     public Collection<ChatToAbonent> chats;
 
+    @OneToMany(mappedBy = "recipient_id")
+    public Collection<Recipient> recipients;
+
+    @OneToMany(mappedBy = "creator")
+    public Collection<Message> messages;
 
 
 }

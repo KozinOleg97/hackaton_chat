@@ -18,17 +18,12 @@ public class Chat extends PanacheEntity {
 
     public String description;
     public String name;
-    public Boolean is_grope_chat;
-    public ZonedDateTime date_of_issue;
+    public Boolean is_active;
+    public ZonedDateTime create_date;
 
 
     @OneToMany(mappedBy = "chat")
     public Collection<ChatToAbonent> abonents;
-
-    @OneToMany(mappedBy = "chat")
-    public Collection<Message> messages;
-
-
 
 
 

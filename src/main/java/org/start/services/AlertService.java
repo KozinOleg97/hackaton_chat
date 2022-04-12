@@ -36,12 +36,12 @@ public class AlertService {
     @Inject
     EventBus bus;
 
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Path("{name}")
-    public Uni<String> greeting(@PathParam("name") String name) {
-        return bus.<String>request("greeting", name).onItem().transform(Message::body);
-    }
+//    @GET
+//    @Produces(MediaType.TEXT_PLAIN)
+//    @Path("{name}")
+//    public Uni<String> greeting(@PathParam("name") String name) {
+//        return bus.<String>request("greeting", name).onItem().transform(Message::body);
+//    }
 
 
 

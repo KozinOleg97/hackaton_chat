@@ -24,7 +24,7 @@ public class CorrectionService {
 
         Message message = new Message();
 
-        message.chat = Chat.findById(card_id);
+//        message.chat = Chat.findById(card_id);
         message.doc = Document.findById(correctionData.doc.id);
 
 

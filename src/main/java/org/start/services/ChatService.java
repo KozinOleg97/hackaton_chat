@@ -29,7 +29,7 @@ public class ChatService {
         Chat chat = new Chat();
         chat.name = cardData.name;
 
-        chat.date_of_issue = cardData.date_of_issue;
+        chat.create_date = cardData.date_of_issue;
 
 
         chat.persistAndFlush();
@@ -38,11 +38,9 @@ public class ChatService {
         Message message = new Message();
 
         message.doc = Document.findById(cardData.doc.id);
-        message.chat = chat;
+//        message.chat = chat;
 
         message.persist();
-
-
 
 
         //TODO Нужно проверить адекватность такого связывания
@@ -67,35 +65,6 @@ public class ChatService {
     }
 
 
-    @GET
-    @Path("/{id}")
-//    @Transactional()
-    public Response getCard(@PathParam("id") long id) {
-
-        Chat chat = Chat.findById(id);
-
-
-        //List<PanacheEntityBase> cardToAbonent = CardToAbonent.list("card_id", id);
-
-        /*
-        Возвращает список абонентов связанных с выбранной карточкой
-         */
-        Collection<ChatToAbonent> list = Abonent.find("SELECT a " +
-                "FROM Abonent a " +
-                "INNER JOIN a.cards c " +
-                "WHERE c.card =  ?1", chat).list();
-
-
-
-        List<Message> messages = Message.list("card_id", id);
-
-
-        chat.abonents = list;
-        chat.messages = messages;
-
-        return Response.ok(chat).build();
-    }
-
     @PUT
     @Path("/{id}")
     @Transactional
@@ -112,7 +81,7 @@ public class ChatService {
         chat.name = cardDataNew.name;
         //card.doc = cardDataNew.doc;
 
-        chat.date_of_issue = cardDataNew.date_of_issue;
+        chat.create_date = cardDataNew.date_of_issue;
 
 
         chat.persist();
@@ -121,9 +90,27 @@ public class ChatService {
 
     @GET
     @Path("")
-    public Response getList() {
-        List<Chat> list = Chat.listAll(Sort.by("date_of_issue"));
+    public Response getListOfChatsByAbonentLogin() {
+        //TODO переделать на получение логина через jwt и на ЛОГИН
+        String abonent_name = "Name_2";
+
+
+        Collection<Chat> list = Chat.find("select c from Chat c\n" +
+                "inner JOIN c.abonents a\n" +
+                "where a.abonent.name = ?1", abonent_name).list();
         return Response.ok(list).build();
+    }
+
+    @GET
+    @Path("/{id}")
+    public Response getChatMessagesById(@PathParam("id") long id) {
+
+        Collection<Message> messageList = Message.find("select m from Message m\n" +
+                "inner join m.recipients a\n" +
+                "where a.recipient_group_id.id = ?1", id).list();
+
+
+        return Response.ok(messageList).build();
     }
 
 
