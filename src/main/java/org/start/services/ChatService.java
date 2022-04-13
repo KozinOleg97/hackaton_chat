@@ -1,20 +1,22 @@
 package org.start.services;
 
-import io.quarkus.security.Authenticated;
 import io.quarkus.security.identity.SecurityIdentity;
-import org.start.beans.Chat.FriendRequest;
+import org.start.beans.Chat.*;
 import org.start.beans.card.CardData;
 import org.start.entity.*;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-@Authenticated
+//@Authenticated
 @Path("api/v1/chats")
 @ApplicationScoped
 @Produces("application/json")
@@ -61,22 +63,6 @@ public class ChatService {
         return Response.ok(chat.id).build();
     }
 
-    @POST
-    @Path("friends")
-    @Transactional
-    public Response addFriend(FriendRequest friendRequest) {
-
-        AbonentAddressBook rec = new AbonentAddressBook();
-
-
-        //rec.
-
-        //AbonentAddressBook book = AbonentAddressBook.findById(rec)
-
-        // chat.persist();
-        return Response.ok().build();
-    }
-
 
     @PUT
     @Path("/{id}")
@@ -106,25 +92,112 @@ public class ChatService {
     public Response getListOfChatsByAbonentLogin() {
         SecurityIdentity s = securityIdent;
 
-        String abonent_name = s.getPrincipal().getName();;
+        String requester_login = s.getPrincipal().getName();
 
 
         Collection<Chat> list = Chat.find("select c from Chat c\n" +
                 "inner JOIN c.abonents a\n" +
-                "where a.abonent.name = ?1", abonent_name).list();
-        return Response.ok(list).build();
+                "where a.abonent.name = ?1", requester_login).list();
+
+        ChatListData chatListData = new ChatListData();
+        chatListData.list = new ArrayList<>();
+
+        for (Chat chat : list) {
+
+            ChatData data = new ChatData();
+            data.id = chat.id;
+            data.name = chat.name;
+
+            chatListData.list.add(data);
+
+        }
+
+        chatListData.user_name = s.getPrincipal().getName();
+
+        return Response.ok(chatListData).build();
     }
 
     @GET
     @Path("/{id}")
     public Response getChatMessagesById(@PathParam("id") long id) {
 
-        Collection<Message> messageList = Message.find("select m from Message m\n" +
-                "inner join m.recipients a\n" +
-                "where a.recipient_group_id.id = ?1", id).list();
+        Chat chat = Chat.findById(id);
+
+        Collection<Message> messagesRaw = Message.list("recipient_group", chat);
+
+        List<MessageDataToSend> messages = new ArrayList<>();
+
+        for (Message mesRaw : messagesRaw) {
+            MessageDataToSend mes = new MessageDataToSend();
+            mes.creator = mesRaw.creator.name;
+            mes.time_stamp = mesRaw.time_stamp;
+            mes.text = mesRaw.text.text;
+
+            messages.add(mes);
+        }
 
 
-        return Response.ok(messageList).build();
+        return Response.ok(messages).build();
+    }
+
+    @GET
+    @Path("/friends")
+    public Response getFriendList() {
+        SecurityIdentity s = securityIdent;
+        String requester_login = s.getPrincipal().getName();
+
+
+        Collection<Chat> list = Chat.find("select a from Abonent a\n" +
+                "inner join a.friends r\n" +
+                "where r.requester.name = ?1", requester_login).list();
+        return Response.ok(list).build();
+    }
+
+    //TODO доделать
+    @POST
+    @Path("/friends/invite")
+    @Transactional
+    public Response inviteFriend(FriendRequest friendRequest) {
+
+        for (String elem : friendRequest.loginList) {
+
+            AbonentAddressBook addressBook = new AbonentAddressBook();
+
+            addressBook.persist();
+
+        }
+
+
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/{id}/send")
+    @Transactional
+    public Response sendMessage(MessageDataReceived messageDataReceived, @PathParam("id") long groupId) {
+        SecurityIdentity s = securityIdent;
+        String sender_name = s.getPrincipal().getName();
+
+        Text text = new Text();
+        text.text = messageDataReceived.text;
+
+        Abonent creator = Abonent.find("name", sender_name).firstResult();
+
+        Chat recipient_group = Chat.findById(groupId);
+
+        Message message = new Message();
+        message.text = text;
+        message.creator = creator;
+        message.doc = null;
+        message.time_stamp = messageDataReceived.timeStamp;
+        message.type = true;
+        message.recipient_group = recipient_group;
+
+
+        message.persist();
+
+
+        return Response.ok().build();
     }
 
 

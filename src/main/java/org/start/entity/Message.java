@@ -22,16 +22,20 @@ public class Message extends PanacheEntity {
     public ZonedDateTime time_stamp;
 
 
-    @OneToMany(mappedBy = "message_id")
-    @JsonIgnore
-    public Collection<Recipient> recipients;
-
     @ManyToOne
     @JoinColumn
     @JsonIgnore
     public Abonent creator;
 
+    @ManyToOne
+    @JoinColumn
+    @JsonIgnore
+    public Abonent recipient;
 
+    @ManyToOne
+    @JoinColumn
+    @JsonIgnore
+    public Chat recipient_group;
 
 
     @OneToOne(cascade = CascadeType.ALL)

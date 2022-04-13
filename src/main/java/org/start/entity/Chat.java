@@ -25,7 +25,8 @@ public class Chat extends PanacheEntity {
     @OneToMany(mappedBy = "chat")
     public Collection<ChatToAbonent> abonents;
 
-
+    @OneToMany(mappedBy = "recipient")
+    public Collection<Message> recipients;
 
 
 //    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL)

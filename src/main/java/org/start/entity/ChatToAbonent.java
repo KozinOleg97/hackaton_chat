@@ -31,9 +31,7 @@ public class ChatToAbonent extends PanacheEntity {
     public ZonedDateTime time_stamp;
 
 
-    @OneToMany(mappedBy = "recipient_group_id")
-    @JsonIgnore
-    public Collection<Recipient> recipients;
+
 
 
 }
